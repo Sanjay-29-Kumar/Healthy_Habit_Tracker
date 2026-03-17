@@ -2,6 +2,9 @@ users={}
 mail_index={}
 next_userid=1
 
+habit_index={}
+next_habitid=1
+
 logged_userid=None
 
 class User:
@@ -71,6 +74,51 @@ class User:
         logged_userid=None
 
 
+class Habit:
+    def __init__(self,habitid,userid,habitname,frequency):
+        self.habitid=habitid
+        self.userid=userid
+        self.habitname=habitname
+        self.frequency=frequency
+
+    def __str__(self):
+        return f"Habit ID: {self.habitid}, Habit Name: {self.habitname}, Frequency: {self.frequency}"
+
+    @staticmethod
+    def addHabit():
+        global next_habitid
+
+        habitname=input("Enter Habit Name: ")
+        frequency=input("Enter Frequency: ")
+
+        habit=Habit(next_habitid,logged_userid,habitname,frequency)
+        habit_index[next_habitid]=habit
+
+        print("Habit added")
+        next_habitid+=1
+
+    @staticmethod
+    def viewHabit():
+        found=False
+        for h in habit_index.values():
+            if h.userid==logged_userid:
+                print(h)
+                found=True
+
+        if not found:
+            print("No habits found")
+    
+    @staticmethod
+    def deleteHabit():
+        hid=int(input("Enter Habit ID: "))
+
+        if hid in habit_index and habit_index[hid].userid==logged_userid:
+            del habit_index[hid]
+            print("Habit deleted")
+        else:
+            print("Invalid Habit ID")
+
+
 while True:
     if logged_userid is None:
         print("\nWelcome...\n1.Register\n2.Login\n3.View Users\n4.Exit")
@@ -89,12 +137,18 @@ while True:
             print("Invalid choice")
     
     else:
-        print("\n1.View Profile\n2.Logout")
+        print("\n1.Add Habit\n2.View Habits\n3.Delete Habit\n4.View Profile\n5.Logout")
         ch=input("Enter choice: ")
 
-        if ch=='1':
+        if ch=="1":
+            Habit.addHabit()
+        elif ch=="2":
+            Habit.viewHabit()
+        elif ch=="3":
+            Habit.deleteHabit()
+        elif ch=="4":
             print(users[logged_userid])
-        elif ch=='2':
+        elif ch=="5":
             User.logout()
         else:
             print("Invalid choice")
