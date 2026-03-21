@@ -7,6 +7,8 @@ next_habitid=1
 
 logged_userid=None
 
+progress_index={}
+
 class User:
     def __init__(self,userid,username,passwordhash,mail):
         self.userid=userid
@@ -119,6 +121,47 @@ class Habit:
             print("Invalid Habit ID")
 
 
+class HabitProgress:
+    def __init__(self,habitid,day):
+        self.habitid=habitid
+        self.day=day
+
+    def __str__(self):
+        return f"HabitID:{self.habitid}, Day:{self.day}, Done"
+
+    @staticmethod
+    def markComplete():
+        hid=int(input("Enter Habit ID: "))
+        day=input("Enter Day (ex: Day1 or 2025-03-21): ")
+
+        if hid not in habit_index or habit_index[hid].userid!=logged_userid:
+            print("Invalid Habit")
+            return
+
+        key=(hid,day)
+
+        if key in progress_index:
+            print("Already marked")
+            return
+
+        progress=HabitProgress(hid,day)
+        progress_index[key]=progress
+
+        print("Marked Done")
+    
+    @staticmethod
+    def viewProgress():
+        found=False
+
+        for p in progress_index.values():
+            if habit_index[p.habitid].userid==logged_userid:
+                print(p)
+                found=True
+
+        if not found:
+            print("No progress found")
+
+
 while True:
     if logged_userid is None:
         print("\nWelcome...\n1.Register\n2.Login\n3.View Users\n4.Exit")
@@ -137,7 +180,7 @@ while True:
             print("Invalid choice")
     
     else:
-        print("\n1.Add Habit\n2.View Habits\n3.Delete Habit\n4.View Profile\n5.Logout")
+        print("\n1.Add Habit\n2.View Habits\n3.Delete Habit\n4.Mark Done\n5.View Progress\n6.View Profile\n7.Logout")
         ch=input("Enter choice: ")
 
         if ch=="1":
@@ -147,8 +190,12 @@ while True:
         elif ch=="3":
             Habit.deleteHabit()
         elif ch=="4":
-            print(users[logged_userid])
+            HabitProgress.markComplete()
         elif ch=="5":
+            HabitProgress.viewProgress()
+        elif ch=="6":
+            print(users[logged_userid])
+        elif ch=="7":
             User.logout()
         else:
             print("Invalid choice")
